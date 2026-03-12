@@ -1,0 +1,21 @@
+h1 {
+    display: flex;
+    justify-content: center;
+}
+
+hr {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+}
+
+form {
+    flex-direction: column;  
+    margin-left: 20px;
+    margin-top: 50px;
+    
+}
+
+th, td {
+    border: 1px solid black;    
+}
