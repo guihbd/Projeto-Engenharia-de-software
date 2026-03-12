@@ -37,6 +37,10 @@ function gerarTabela() {
 
     // 7. Limpa o formulário para a próxima inserção
     document.querySelector('form').reset();
+
+    // 8. Reaplica filtro atual, se houver
+    const termoAtual = document.getElementById('buscaProduto').value;
+    filtrarProdutos(termoAtual);
 }
 
 function editarLinha(botao) {
@@ -67,6 +71,9 @@ function editarLinha(botao) {
     linha.cells[2].innerText = novaQuantidade;
     linha.cells[3].innerText = "R$ " + parseFloat(novoPreco).toFixed(2);
     linha.cells[4].innerText = novoFornecedor;
+
+    const termoAtual = document.getElementById('buscaProduto').value;
+    filtrarProdutos(termoAtual);
 }
 
 function deletarLinha(botao) {
@@ -79,4 +86,34 @@ function deletarLinha(botao) {
     if (corpo.rows.length === 0) {
         tabela.style.display = 'none';
     }
+}
+
+function filtrarProdutos(termoBusca) {
+    const tabela = document.getElementById('minhaTabela');
+    const corpo = document.getElementById('corpoTabela');
+    const linhas = corpo.querySelectorAll('tr');
+
+    if (linhas.length === 0) {
+        tabela.style.display = 'none';
+        return;
+    }
+
+    const termo = termoBusca.trim().toLowerCase();
+    let possuiLinhaVisivel = false;
+
+    linhas.forEach((linha) => {
+        const id = linha.cells[0].innerText.toLowerCase();
+        const nome = linha.cells[1].innerText.toLowerCase();
+        const fornecedor = linha.cells[4].innerText.toLowerCase();
+
+        const corresponde = !termo || id.includes(termo) || nome.includes(termo) || fornecedor.includes(termo);
+
+        linha.style.display = corresponde ? '' : 'none';
+
+        if (corresponde) {
+            possuiLinhaVisivel = true;
+        }
+    });
+
+    tabela.style.display = possuiLinhaVisivel ? 'table' : 'none';
 }
