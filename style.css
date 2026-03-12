@@ -4,16 +4,46 @@ h1 {
 }
 
 hr {
-    position: absolute;
-    left: 0px;
-    right: 0px;
+    width: 100%;
+}
+
+.topo-acoes {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 20px 0;
+}
+
+#buscaProduto {
+    width: 260px;
+    padding: 6px;
 }
 
 form {
-    flex-direction: column;  
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     margin-left: 20px;
-    margin-top: 50px;
-    
+    margin-top: 24px;
+    max-width: 460px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    align-items: center;
+    column-gap: 12px;
+}
+
+.form-row input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px;
+}
+
+form button {
+    width: fit-content;
 }
 
 #minhaTabela {
