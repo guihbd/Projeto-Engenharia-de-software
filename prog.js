@@ -1,3 +1,18 @@
+function idJaExiste(idInformado, linhaIgnorada = null) {
+    const corpo = document.getElementById('corpoTabela');
+    const linhas = corpo.querySelectorAll('tr');
+    const idNormalizado = idInformado.trim().toLowerCase();
+
+    return Array.from(linhas).some((linha) => {
+        if (linha === linhaIgnorada) {
+            return false;
+        }
+
+        const idLinha = linha.cells[0].innerText.trim().toLowerCase();
+        return idLinha === idNormalizado;
+    });
+}
+
 function gerarTabela() {
     // 1. Captura os elementos de entrada (Verifique as cedilhas!)
     const nome = document.getElementById('nome').value;
@@ -9,6 +24,11 @@ function gerarTabela() {
     // 2. Validação: verifica se algum campo está vazio
     if (!nome || !id || !quantidade || !preco || !fornecedor) {
         alert('Por favor, preencha todos os campos!');
+        return;
+    }
+
+    if (idJaExiste(id)) {
+        alert('Este ID já está cadastrado. Informe um ID diferente.');
         return;
     }
 
@@ -53,6 +73,11 @@ function editarLinha(botao) {
 
     const novoId = prompt('Editar ID do produto:', idAtual);
     if (novoId === null || novoId.trim() === '') return;
+
+    if (idJaExiste(novoId, linha)) {
+        alert('Este ID já está cadastrado. Informe um ID diferente.');
+        return;
+    }
 
     const novoNome = prompt('Editar nome do produto:', nomeAtual);
     if (novoNome === null || novoNome.trim() === '') return;
