@@ -1,10 +1,41 @@
+:root {
+    --cor-fundo: #f5f7fb;
+    --cor-superficie: #ffffff;
+    --cor-borda: #d9deea;
+    --cor-texto: #1f2937;
+    --cor-primaria: #2563eb;
+    --cor-primaria-escura: #1d4ed8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 24px;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 h1 {
-    display: flex;
-    justify-content: center;
+    margin: 0;
+    text-align: center;
 }
 
 hr {
-    width: 100%;
+    margin: 16px 0 24px;
+    border: none;
+    border-top: 1px solid var(--cor-borda);
+}
+
+.topo-acoes,
+form,
+#minhaTabela {
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .topo-acoes {
@@ -12,44 +43,111 @@ hr {
     justify-content: flex-end;
     align-items: center;
     gap: 8px;
-    margin: 12px 20px 0;
+    margin-bottom: 16px;
+}
+
+#buscaProduto,
+.form-row input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    font-size: 14px;
 }
 
 #buscaProduto {
-    width: 260px;
-    padding: 6px;
+    max-width: 300px;
 }
 
 form {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 12px;
-    margin-left: 20px;
-    margin-top: 24px;
-    max-width: 460px;
+    padding: 16px;
+    background-color: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
 }
 
 .form-row {
     display: grid;
-    grid-template-columns: 130px 1fr;
+    grid-template-columns: 160px 1fr;
     align-items: center;
-    column-gap: 12px;
+    gap: 12px;
 }
 
-.form-row input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 6px;
+button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--cor-primaria);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-form button {
-    width: fit-content;
+button:hover {
+    background-color: var(--cor-primaria-escura);
 }
 
 #minhaTabela {
-    margin: 30px auto;
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background-color: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-th, td {
-    border: 1px solid black;
+th,
+td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--cor-borda);
+    text-align: left;
+}
+
+th {
+    background-color: #eef2ff;
+}
+
+td:last-child {
+    white-space: nowrap;
+}
+
+td:last-child button {
+    margin-right: 6px;
+}
+
+td:last-child button:last-child {
+    margin-right: 0;
+    background-color: #dc2626;
+}
+
+td:last-child button:last-child:hover {
+    background-color: #b91c1c;
+}
+
+@media (max-width: 760px) {
+    body {
+        padding: 16px;
+    }
+
+    .topo-acoes {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #buscaProduto {
+        max-width: none;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    #minhaTabela {
+        display: block;
+        overflow-x: auto;
+    }
 }
