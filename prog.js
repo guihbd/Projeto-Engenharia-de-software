@@ -13,38 +13,28 @@ function idJaExiste(idInformado, linhaIgnorada = null) {
     });
 }
 
-function gerarTabela() {
-    // 1. Captura os elementos de entrada (Verifique as cedilhas!)
-    const nome = document.getElementById('nome').value;
-    const id = document.getElementById('id').value;
-    const quantidade = document.getElementById('quantidade').value;
-    const preco = document.getElementById('preço').value; // Com cedilha igual ao HTML
-    const fornecedor = document.getElementById('fornecedor').value;
+function exibirMensagem(texto, tipo = 'sucesso') {
+    const mensagem = document.getElementById('mensagemFormulario');
+    mensagem.innerText = texto;
+    mensagem.className = `mensagem-formulario ${tipo}`;
+}
 
-    // 2. Validação: verifica se algum campo está vazio
-    if (!nome || !id || !quantidade || !preco || !fornecedor) {
-        alert('Por favor, preencha todos os campos!');
-        return;
-    }
+function limparMensagem() {
+    const mensagem = document.getElementById('mensagemFormulario');
+    mensagem.innerText = '';
+    mensagem.className = 'mensagem-formulario';
+}
 
-    if (idJaExiste(id)) {
-        alert('Este ID já está cadastrado. Informe um ID diferente.');
-        return;
-    }
-
-    // 3. Seleciona os elementos da tabela
+function adicionarLinhaTabela(produto) {
     const tabela = document.getElementById('minhaTabela');
     const corpo = document.getElementById('corpoTabela');
-
-    // 4. Cria uma nova linha e insere as células
     const novaLinha = corpo.insertRow();
 
-    // 5. Preenche as células na ordem correta
-    novaLinha.insertCell(0).innerText = id;
-    novaLinha.insertCell(1).innerText = nome;
-    novaLinha.insertCell(2).innerText = quantidade;
-    novaLinha.insertCell(3).innerText = "R$ " + parseFloat(preco).toFixed(2);
-    novaLinha.insertCell(4).innerText = fornecedor;
+    novaLinha.insertCell(0).innerText = produto.id;
+    novaLinha.insertCell(1).innerText = produto.nome;
+    novaLinha.insertCell(2).innerText = produto.quantidade;
+    novaLinha.insertCell(3).innerText = 'R$ ' + Number(produto.preco).toFixed(2);
+    novaLinha.insertCell(4).innerText = produto.fornecedor;
 
     const acoes = novaLinha.insertCell(5);
     acoes.innerHTML = `
@@ -52,15 +42,69 @@ function gerarTabela() {
         <button type="button" onclick="deletarLinha(this)">Deletar</button>
     `;
 
-    // 6. Faz a tabela ficar visível
     tabela.style.display = 'table';
 
-    // 7. Limpa o formulário para a próxima inserção
-    document.querySelector('form').reset();
-
-    // 8. Reaplica filtro atual, se houver
     const termoAtual = document.getElementById('buscaProduto').value;
     filtrarProdutos(termoAtual);
+}
+
+async function enviarFormulario(evento) {
+    evento.preventDefault();
+
+    const formulario = document.getElementById('formProduto');
+    const botaoInserir = document.getElementById('botaoInserir');
+    const formData = new FormData(formulario);
+
+    const nome = formData.get('nome').trim();
+    const id = formData.get('id').trim();
+    const quantidade = formData.get('quantidade').trim();
+    const preco = formData.get('preco').trim();
+    const fornecedor = formData.get('fornecedor').trim();
+
+    if (!nome || !id || !quantidade || !preco || !fornecedor) {
+        exibirMensagem('Por favor, preencha todos os campos.', 'erro');
+        return;
+    }
+
+    if (Number.isNaN(Number(preco))) {
+        exibirMensagem('Informe um preço válido.', 'erro');
+        return;
+    }
+
+    if (idJaExiste(id)) {
+        exibirMensagem('Este ID já está cadastrado. Informe um ID diferente.', 'erro');
+        return;
+    }
+
+    limparMensagem();
+    botaoInserir.disabled = true;
+    botaoInserir.innerText = 'Inserindo...';
+
+    try {
+        const resposta = await fetch(formulario.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok || !resultado.sucesso) {
+            exibirMensagem(resultado.mensagem || 'Não foi possível salvar o produto.', 'erro');
+            return;
+        }
+
+        adicionarLinhaTabela(resultado.produto);
+        formulario.reset();
+        exibirMensagem(resultado.mensagem || 'Produto cadastrado com sucesso.', 'sucesso');
+    } catch (erro) {
+        exibirMensagem('Erro ao enviar os dados. Tente novamente.', 'erro');
+    } finally {
+        botaoInserir.disabled = false;
+        botaoInserir.innerText = 'Inserir';
+    }
 }
 
 function editarLinha(botao) {
@@ -94,7 +138,7 @@ function editarLinha(botao) {
     linha.cells[0].innerText = novoId;
     linha.cells[1].innerText = novoNome;
     linha.cells[2].innerText = novaQuantidade;
-    linha.cells[3].innerText = "R$ " + parseFloat(novoPreco).toFixed(2);
+    linha.cells[3].innerText = 'R$ ' + parseFloat(novoPreco).toFixed(2);
     linha.cells[4].innerText = novoFornecedor;
 
     const termoAtual = document.getElementById('buscaProduto').value;
@@ -142,3 +186,5 @@ function filtrarProdutos(termoBusca) {
 
     tabela.style.display = possuiLinhaVisivel ? 'table' : 'none';
 }
+
+document.getElementById('formProduto').addEventListener('submit', enviarFormulario);

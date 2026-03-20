@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Cadastro de produtos</title>
 </head>
 <body>
     <h1>Produtos</h1>
@@ -21,7 +21,7 @@
         >
     </div>
 
-    <form action="cad.php" onsubmit="gerarTabela(); return false;" method="POST">
+    <form id="formProduto" action="cad.php" method="POST">
         <div class="form-row">
             <label for="nome">Nome:</label>
             <input type="text" id="nome" name="nome">
@@ -47,7 +47,8 @@
             <input type="text" id="fornecedor" name="fornecedor">
         </div>
 
-        <button type="submit" value="submit">Inserir</button>
+        <button id="botaoInserir" type="submit" value="submit">Inserir</button>
+        <p id="mensagemFormulario" class="mensagem-formulario" aria-live="polite"></p>
     </form>
 
     <table id="minhaTabela" style="display: none;">

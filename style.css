@@ -94,6 +94,26 @@ button:hover {
     background-color: var(--cor-primaria-escura);
 }
 
+button:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.mensagem-formulario {
+    min-height: 20px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mensagem-formulario.sucesso {
+    color: #15803d;
+}
+
+.mensagem-formulario.erro {
+    color: #b91c1c;
+}
+
 #minhaTabela {
     width: 100%;
     margin-top: 20px;
