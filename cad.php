@@ -29,12 +29,11 @@ if (!$conn) {
 mysqli_set_charset($conn, 'utf8mb4');
 
 $nome = trim($_POST['nome'] ?? '');
-$id = trim($_POST['id'] ?? '');
 $quantidade = trim($_POST['quantidade'] ?? '');
 $preco = trim($_POST['preco'] ?? '');
 $fornecedor = trim($_POST['fornecedor'] ?? '');
 
-if ($nome === '' || $id === '' || $quantidade === '' || $preco === '' || $fornecedor === '') {
+if ($nome === '' || $quantidade === '' || $preco === '' || $fornecedor === '') {
     http_response_code(422);
     echo json_encode([
         'sucesso' => false,
@@ -54,26 +53,8 @@ if (!is_numeric($preco)) {
     exit;
 }
 
-$verifica = mysqli_prepare($conn, 'SELECT id FROM produtos WHERE id = ? LIMIT 1');
-mysqli_stmt_bind_param($verifica, 's', $id);
-mysqli_stmt_execute($verifica);
-mysqli_stmt_store_result($verifica);
-
-if (mysqli_stmt_num_rows($verifica) > 0) {
-    http_response_code(409);
-    echo json_encode([
-        'sucesso' => false,
-        'mensagem' => 'Este ID já está cadastrado no banco de dados.'
-    ], JSON_UNESCAPED_UNICODE);
-    mysqli_stmt_close($verifica);
-    mysqli_close($conn);
-    exit;
-}
-
-mysqli_stmt_close($verifica);
-
-$sql = mysqli_prepare($conn, 'INSERT INTO produtos (id, nome, quantidade, preco, fornecedor) VALUES (?, ?, ?, ?, ?)');
-mysqli_stmt_bind_param($sql, 'sssss', $id, $nome, $quantidade, $preco, $fornecedor);
+$sql = mysqli_prepare($conn, 'INSERT INTO produtos (nome, quantidade, preco, fornecedor) VALUES (?, ?, ?, ?)');
+mysqli_stmt_bind_param($sql, 'ssss', $nome, $quantidade, $preco, $fornecedor);
 
 if (!mysqli_stmt_execute($sql)) {
     http_response_code(500);
@@ -86,14 +67,16 @@ if (!mysqli_stmt_execute($sql)) {
     exit;
 }
 
+$idInserido = mysqli_insert_id($conn);
+
 mysqli_stmt_close($sql);
 mysqli_close($conn);
 
 echo json_encode([
     'sucesso' => true,
-    'mensagem' => 'Produto cadastrado com sucesso sem recarregar a página.',
+    'mensagem' => 'Produto cadastrado com sucesso.',
     'produto' => [
-        'id' => $id,
+        'id' => $idInserido,
         'nome' => $nome,
         'quantidade' => $quantidade,
         'preco' => $preco,

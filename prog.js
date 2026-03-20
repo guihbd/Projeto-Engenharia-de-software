@@ -1,18 +1,3 @@
-function idJaExiste(idInformado, linhaIgnorada = null) {
-    const corpo = document.getElementById('corpoTabela');
-    const linhas = corpo.querySelectorAll('tr');
-    const idNormalizado = idInformado.trim().toLowerCase();
-
-    return Array.from(linhas).some((linha) => {
-        if (linha === linhaIgnorada) {
-            return false;
-        }
-
-        const idLinha = linha.cells[0].innerText.trim().toLowerCase();
-        return idLinha === idNormalizado;
-    });
-}
-
 function exibirMensagem(texto, tipo = 'sucesso') {
     const mensagem = document.getElementById('mensagemFormulario');
     mensagem.innerText = texto;
@@ -56,23 +41,17 @@ async function enviarFormulario(evento) {
     const formData = new FormData(formulario);
 
     const nome = formData.get('nome').trim();
-    const id = formData.get('id').trim();
     const quantidade = formData.get('quantidade').trim();
     const preco = formData.get('preco').trim();
     const fornecedor = formData.get('fornecedor').trim();
 
-    if (!nome || !id || !quantidade || !preco || !fornecedor) {
+    if (!nome || !quantidade || !preco || !fornecedor) {
         exibirMensagem('Por favor, preencha todos os campos.', 'erro');
         return;
     }
 
     if (Number.isNaN(Number(preco))) {
         exibirMensagem('Informe um preço válido.', 'erro');
-        return;
-    }
-
-    if (idJaExiste(id)) {
-        exibirMensagem('Este ID já está cadastrado. Informe um ID diferente.', 'erro');
         return;
     }
 
@@ -98,7 +77,7 @@ async function enviarFormulario(evento) {
 
         adicionarLinhaTabela(resultado.produto);
         formulario.reset();
-        exibirMensagem(resultado.mensagem || 'Produto cadastrado com sucesso.', 'sucesso');
+        exibirMensagem('Produto cadastrado com sucesso.', 'sucesso');
     } catch (erro) {
         exibirMensagem('Erro ao enviar os dados. Tente novamente.', 'erro');
     } finally {
@@ -117,11 +96,6 @@ function editarLinha(botao) {
 
     const novoId = prompt('Editar ID do produto:', idAtual);
     if (novoId === null || novoId.trim() === '') return;
-
-    if (idJaExiste(novoId, linha)) {
-        alert('Este ID já está cadastrado. Informe um ID diferente.');
-        return;
-    }
 
     const novoNome = prompt('Editar nome do produto:', nomeAtual);
     if (novoNome === null || novoNome.trim() === '') return;
