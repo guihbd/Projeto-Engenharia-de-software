@@ -72,7 +72,7 @@ function preencherTabela(produtos) {
 
 async function carregarProdutos() {
     try {
-        const resposta = await fetch('cad.php', {
+        const resposta = await fetch('/produtos', {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
@@ -95,12 +95,17 @@ async function enviarFormulario(evento) {
 
     const formulario = document.getElementById('formProduto');
     const botaoInserir = document.getElementById('botaoInserir');
-    const formData = new FormData(formulario);
+    const dados = new URLSearchParams({
+        nome: formulario.nome.value.trim(),
+        quantidade: formulario.quantidade.value.trim(),
+        preco: formulario.preco.value.trim(),
+        fornecedor: formulario.fornecedor.value.trim()
+    });
 
-    const nome = formData.get('nome').trim();
-    const quantidade = formData.get('quantidade').trim();
-    const preco = formData.get('preco').trim();
-    const fornecedor = formData.get('fornecedor').trim();
+    const nome = dados.get('nome');
+    const quantidade = dados.get('quantidade');
+    const preco = dados.get('preco');
+    const fornecedor = dados.get('fornecedor');
 
     if (!nome || !quantidade || !preco || !fornecedor) {
         exibirMensagem('Por favor, preencha todos os campos.', 'erro');
@@ -119,8 +124,9 @@ async function enviarFormulario(evento) {
     try {
         const resposta = await fetch(formulario.action, {
             method: 'POST',
-            body: formData,
+            body: dados.toString(),
             headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
@@ -163,21 +169,23 @@ async function editarLinha(botao) {
     const novoFornecedor = prompt('Editar fornecedor:', fornecedorAtual);
     if (novoFornecedor === null || novoFornecedor.trim() === '') return;
 
-    const dados = new FormData();
-    dados.append('acao', 'editar');
-    dados.append('id', id);
-    dados.append('nome', novoNome.trim());
-    dados.append('quantidade', novaQuantidade.trim());
-    dados.append('preco', novoPreco.trim());
-    dados.append('fornecedor', novoFornecedor.trim());
+    const dados = new URLSearchParams({
+        acao: 'editar',
+        id: String(id),
+        nome: novoNome.trim(),
+        quantidade: novaQuantidade.trim(),
+        preco: novoPreco.trim(),
+        fornecedor: novoFornecedor.trim()
+    });
 
     botao.disabled = true;
 
     try {
-        const resposta = await fetch('cad.php', {
+        const resposta = await fetch('/produtos', {
             method: 'POST',
-            body: dados,
+            body: dados.toString(),
             headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
@@ -211,17 +219,19 @@ async function deletarLinha(botao) {
         return;
     }
 
-    const dados = new FormData();
-    dados.append('acao', 'deletar');
-    dados.append('id', id);
+    const dados = new URLSearchParams({
+        acao: 'deletar',
+        id: String(id)
+    });
 
     botao.disabled = true;
 
     try {
-        const resposta = await fetch('cad.php', {
+        const resposta = await fetch('/produtos', {
             method: 'POST',
-            body: dados,
+            body: dados.toString(),
             headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
