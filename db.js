@@ -1,6 +1,8 @@
 const http = require('http');
 const { URL } = require('url');
 const querystring = require('querystring');
+const fs = require('fs');
+const path = require('path');
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
@@ -20,6 +22,39 @@ function responderJson(res, statusCode, dados) {
   });
 
   res.end(JSON.stringify(dados));
+}
+
+function responderTexto(res, statusCode, conteudo, tipoConteudo) {
+  res.writeHead(statusCode, {
+    'Content-Type': tipoConteudo
+  });
+
+  res.end(conteudo);
+}
+
+function servirArquivoEstatico(res, nomeArquivo) {
+  const caminhoArquivo = path.join(__dirname, nomeArquivo);
+
+  const tipos = {
+    '.html': 'text/html; charset=UTF-8',
+    '.js': 'application/javascript; charset=UTF-8',
+    '.css': 'text/css; charset=UTF-8'
+  };
+
+  const extensao = path.extname(caminhoArquivo).toLowerCase();
+  const tipoConteudo = tipos[extensao] || 'application/octet-stream';
+
+  fs.readFile(caminhoArquivo, (erro, conteudo) => {
+    if (erro) {
+      responderJson(res, 500, {
+        sucesso: false,
+        mensagem: 'Erro ao carregar os arquivos da interface.'
+      });
+      return;
+    }
+
+    responderTexto(res, 200, conteudo, tipoConteudo);
+  });
 }
 
 function validarProduto(nome, quantidade, preco, fornecedor) {
@@ -233,6 +268,18 @@ async function deletarProduto(res, dados) {
 
 async function processarRequisicao(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+
+  if (req.method === 'GET') {
+    if (url.pathname === '/' || url.pathname === '/index' || url.pathname === '/index.html') {
+      servirArquivoEstatico(res, 'front.html');
+      return;
+    }
+
+    if (url.pathname === '/front.html' || url.pathname === '/prog.js' || url.pathname === '/style.css') {
+      servirArquivoEstatico(res, url.pathname.slice(1));
+      return;
+    }
+  }
 
   if (url.pathname !== '/produtos') {
     responderJson(res, 404, {
